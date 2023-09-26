@@ -15,6 +15,7 @@ app.get('/check/:caseNumber', async (req, res) => {
   const caseNumber = req.params.caseNumber
   const caseFound = await checkCase(caseNumber)
   res.send(caseFound ? 'Case was found.' : 'Case was NOT found.')
+  
   if (!caseFound) {
     return fetch(ntfyUrl, {
       method: 'POST',
@@ -22,7 +23,7 @@ app.get('/check/:caseNumber', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        topic: 'ruling',
+        topic: 'ruling-not-found',
         message: `Case ${caseNumber} was NOT found.`
       })
     })
