@@ -1,26 +1,17 @@
-const puppeteer = require('puppeteer');
+const express = require('express')
+const puppeteer = require('puppeteer')
 
-(async () => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('https://www.lacourt.org/tentativeRulingNet/ui/main.aspx?casetype=civil');
+const checkCase = require('./check-case')
 
-    // Enter the case number into the search box
-    await page.type('input[name="CaseNumber"]', '21STCV26571');
+const app = express()
 
-    // Click the search button
-    await Promise.all([
-        page.waitForNavigation(),
-        page.click('input[id="submit2"]'),
-    ]);
+app.get('/check/:caseNumber', async (req, res) => {
+  const caseNumber = req.params.caseNumber
+  const caseFound = await checkCase(caseNumber)
+  res.send(caseFound ? 'Case was found.' : 'Case was NOT found.')
+})
 
-    // Check if the case was found
-    const caseFound = await page.evaluate(() => {
-        const noResultsElement = document.querySelector('#speechSynthesis');
-        return !noResultsElement || !noResultsElement.innerText.includes('No rulings found');
-    });
-
-    console.log(caseFound ? 'Case was found.' : 'Case was not found.');
-
-    await browser.close();
-})();
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+})
