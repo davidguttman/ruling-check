@@ -1,12 +1,15 @@
 require('isomorphic-fetch')
 const express = require('express')
 const puppeteer = require('puppeteer')
+const healthpoint = require('healthpoint')()
 
 const checkCase = require('./check-case')
 
 const ntfyUrl = 'https://ntfy.thhis.com'
 
 const app = express()
+
+app.get('/health', healthpoint)
 
 app.get('/check/:caseNumber', async (req, res) => {
   const caseNumber = req.params.caseNumber
